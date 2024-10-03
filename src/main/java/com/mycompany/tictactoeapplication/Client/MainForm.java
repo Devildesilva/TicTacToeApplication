@@ -44,6 +44,7 @@ public class MainForm extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
+        lblMyTeam = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -132,6 +133,9 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        lblMyTeam.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        lblMyTeam.setRequestFocusEnabled(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -158,15 +162,19 @@ public class MainForm extends javax.swing.JFrame {
                                 .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6))
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblMyTeam, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(12, 12, 12))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -175,9 +183,14 @@ public class MainForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jLabel1)
-                .addGap(22, 22, 22)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(22, 22, 22))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(lblMyTeam, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -192,7 +205,7 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
 
         pack();
@@ -268,6 +281,62 @@ public class MainForm extends javax.swing.JFrame {
         out.println(0);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    public void ShowWinMessage(){
+        JOptionPane.showMessageDialog(this,"You WON!");
+    }
+    
+    private class ServerListener implements Runnable {
+        @Override
+        public void run() {
+            System.out.println("Starting listening to server");
+            try {
+                while (!Thread.currentThread().isInterrupted() && in.hasNextLine()) {
+                    String message = in.nextLine();
+                    System.out.println("Server says: " + message);
+                    
+                    if(message.contains("BOARD:")){
+                        String boardArrayStr = message.replace("BOARD:","");
+                        String[] boardArray = boardArrayStr.split(",");
+                        
+                        jButton2.setText(boardArray[0]);
+                        jButton3.setText(boardArray[1]);
+                        jButton4.setText(boardArray[2]);
+                        jButton5.setText(boardArray[3]);
+                        jButton6.setText(boardArray[4]);
+                        jButton7.setText(boardArray[5]);
+                        jButton8.setText(boardArray[6]);
+                        jButton9.setText(boardArray[7]);
+                        jButton10.setText(boardArray[8]);
+                    }else if(message.contains("WIN")){
+                        ShowWinMessage();
+                    }else if(message.contains("PLAYER_NUM:")){
+                        int playerNum = parseInt(message.replace("PLAYER_NUM:",""));
+                        playerNumber = playerNum;
+                    }else if(message.contains("MARK:")){
+                        lblMyTeam.setText(message.replace("MARK:", ""));
+                    }else if(message.contains("TURN:")){
+                        int currentPlayer =  parseInt(message.replace("TURN:",""));
+                        System.out.println("Its " + currentPlayer +" turn");
+                        if(currentPlayer == playerNumber){
+                            jLabel1.setText("Your turn, Click on an empty square");
+                        }else{
+                            jLabel1.setText("Opponent is playing, please wait.");
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                if (!Thread.currentThread().isInterrupted()) {
+                    System.out.println("Error reading from server: " + e.getMessage());
+                }else{
+                    System.out.println("Gracefully stopped listening to server");
+                }
+            }
+        }
+    }
+    
+    
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -319,5 +388,6 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel lblMyTeam;
     // End of variables declaration//GEN-END:variables
 }
